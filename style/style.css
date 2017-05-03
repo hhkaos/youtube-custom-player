@@ -1,0 +1,15 @@
+.player-canvas{
+
+}
+.player-toolbar{
+  background-color: rgba(0,0,0,.5);
+  top: -40px;
+  position: relative;
+}
+.player-toolbar .fa{
+  color: white;
+  cursor: pointer;
+}
+i.myBtn{
+  padding: 10px 20px;
+}
