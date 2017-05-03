@@ -1,5 +1,5 @@
 # Youtube custom player
-React wrapper for Youtube video player with extra capabilities
+React wrapper for Youtube video player with extra capabilities like been able to shorten a video length.
 
 ## How to
 
