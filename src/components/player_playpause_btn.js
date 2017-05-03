@@ -11,7 +11,6 @@ const PlayerPlaypauseBtn = ({onClick, status}) => {
   }else{
     str = 'fa fa-play myBtn';
   }
-  console.log("Llego");
 
   return (
     <i
