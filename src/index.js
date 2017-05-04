@@ -18,7 +18,8 @@ class App extends React.Component {
             // https://developers.google.com/youtube/player_parameters
             controls: 0, //Disable controls
             autoplay: 0, //No autoplay
-            start: 90 // Start at second 90
+            start: 1800, // Start at second 90
+            //end: 10
           }
         }
       }

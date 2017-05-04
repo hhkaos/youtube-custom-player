@@ -10,6 +10,9 @@
   color: white;
   cursor: pointer;
 }
+.player-toolbar span{
+  color: white;
+}
 i.myBtn{
   padding: 10px 20px;
 }
