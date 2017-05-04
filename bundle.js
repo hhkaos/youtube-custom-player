@@ -94,8 +94,7 @@
 	            // https://developers.google.com/youtube/player_parameters
 	            controls: 0, //Disable controls
 	            autoplay: 0, //No autoplay
-	            start: 90 // Start at second 90
-	          }
+	            start: 1800 }
 	        }
 	      }
 	    };
@@ -19843,6 +19842,10 @@
 
 	var _player_playpause_btn2 = _interopRequireDefault(_player_playpause_btn);
 
+	var _player_timer = __webpack_require__(301);
+
+	var _player_timer2 = _interopRequireDefault(_player_timer);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19850,9 +19853,6 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	//import PlayerCanvas from './player_canvas.js'
-
 
 	var YoutubeCustomPlayer = function (_React$Component) {
 	  _inherits(YoutubeCustomPlayer, _React$Component);
@@ -19871,6 +19871,8 @@
 	    _this.onReady = _this.onReady.bind(_this);
 	    _this.onStateChange = _this.onStateChange.bind(_this);
 	    _this.onPlayPauseVideo = _this.onPlayPauseVideo.bind(_this);
+	    _this.myTimer = _this.myTimer.bind(_this);
+	    _this.startStopTimer = _this.startStopTimer.bind(_this);
 	    return _this;
 	  }
 
@@ -19878,11 +19880,42 @@
 	    key: 'onReady',
 	    value: function onReady(event) {
 	      this.setState({ player: event.target });
+
+	      var pv = this.props.playerConfig.opts.playerVars;
+	      var start = pv.start ? pv.start : 0;
+	      var end = pv.end ? pv.end : this.state.player.getDuration();
+
+	      this.state.player.seekTo(start);
+	      this.setState({ start: start });
+	      this.setState({ duration: end - start });
+	    }
+	  }, {
+	    key: 'myTimer',
+	    value: function myTimer(event) {
+	      this.setState({
+	        currentTime: this.state.player.getCurrentTime()
+	      });
 	    }
 	  }, {
 	    key: 'onStateChange',
 	    value: function onStateChange(event) {
 	      this.setState({ status: event.data });
+
+	      if (event.data === 1) {
+	        // start playing
+	        this.startStopTimer('start');
+	      } else {
+	        this.startStopTimer('stop');
+	      }
+	    }
+	  }, {
+	    key: 'startStopTimer',
+	    value: function startStopTimer(action) {
+	      if (action === 'stop') {
+	        clearInterval(this.countdown);
+	      } else {
+	        this.countdown = setInterval(this.myTimer, 500);
+	      }
 	    }
 	  }, {
 	    key: 'onPlayPauseVideo',
@@ -19900,6 +19933,7 @@
 	        width: this.state.opts.width + 'px',
 	        height: this.state.opts.height + 60 + 'px'
 	      };
+
 	      return _react2.default.createElement(
 	        'div',
 	        { style: style },
@@ -19915,7 +19949,11 @@
 	          { className: 'player-toolbar' },
 	          _react2.default.createElement(_player_playpause_btn2.default, {
 	            status: this.state.status,
-	            onClick: this.onPlayPauseVideo })
+	            onClick: this.onPlayPauseVideo }),
+	          _react2.default.createElement(_player_timer2.default, {
+	            start: this.state.start,
+	            currentTime: this.state.currentTime,
+	            duration: this.state.duration })
 	        )
 	      );
 	    }
@@ -27535,7 +27573,6 @@
 	  } else {
 	    str = 'fa fa-play myBtn';
 	  }
-	  console.log("Llego");
 
 	  return _react2.default.createElement('i', {
 	    className: str,
@@ -27546,6 +27583,69 @@
 	};
 
 	exports.default = PlayerPlaypauseBtn;
+
+/***/ }),
+/* 301 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/*jshint esversion: 6 */
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var PlayerTimer = function PlayerTimer(_ref) {
+	  var currentTime = _ref.currentTime,
+	      duration = _ref.duration,
+	      start = _ref.start;
+
+
+	  var secsToStr = function secsToStr(totalSeconds) {
+	    var hours = Math.floor(totalSeconds / 3600);
+	    totalSeconds %= 3600;
+	    var minutes = Math.floor(totalSeconds / 60);
+	    var seconds = totalSeconds % 60;
+
+	    var output = '';
+	    if (hours > 0) {
+	      output += hours + ':';
+	    }
+	    if (minutes > 0 || hours > 0) {
+	      output += ('0' + minutes).slice(-2);
+	    } else {
+	      output += '00';
+	    }
+	    if (seconds) {
+	      output += ':' + ('0' + seconds).slice(-2);
+	    } else {
+	      output += ':' + '00';
+	    }
+
+	    return output;
+	  };
+
+	  var ct = '00:00';
+	  if (currentTime - start > 0) {
+	    ct = secsToStr(parseInt(currentTime - start));
+	  }
+	  duration = secsToStr(parseInt(duration));
+	  return _react2.default.createElement(
+	    'span',
+	    null,
+	    ct,
+	    ' / ',
+	    duration
+	  );
+	};
+
+	exports.default = PlayerTimer;
 
 /***/ })
 /******/ ]);
