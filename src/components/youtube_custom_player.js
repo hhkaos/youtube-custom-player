@@ -5,7 +5,8 @@ import React, { Component } from 'react';
 import YouTube from 'react-youtube';
 import PlaypauseBtn from './player_playpause_btn';
 import PlayerTimer from './player_timer';
-import PlayerTitle from './player_title.js';
+import PlayerTitle from './player_title';
+import PlayerSeekTo from './player_seekto';
 import YoutubeWorkaround from './youtube_workaround';
 
 class YoutubeCustomPlayer extends React.Component {
@@ -36,6 +37,8 @@ class YoutubeCustomPlayer extends React.Component {
     this.myTimer = this.myTimer.bind(this);
     this.startStopTimer = this.startStopTimer.bind(this);
     this.showPlayerTitle = this.showPlayerTitle.bind(this);
+    this.onSeekTo = this.onSeekTo.bind(this);
+
   }
 
   onReady(event) {
@@ -81,6 +84,10 @@ class YoutubeCustomPlayer extends React.Component {
       this.startStopTimer('stop');
     }
 
+    if(event.data === 0){
+      this.setState({currentTime: this.state.end});
+    }
+
     YoutubeWorkaround(this.state, history);
 
 
@@ -119,6 +126,22 @@ class YoutubeCustomPlayer extends React.Component {
     }
   }
 
+  onSeekTo(amount) {
+//debugger
+    const a = parseInt(amount),
+          cT = this.state.player.getCurrentTime();
+    let moment = cT + a;
+
+    if(moment < this.state.start){
+      moment = this.state.start;
+    }else if(moment > this.state.end){
+      moment = this.state.end;
+      this.setState({end: this.state.end});
+    }
+
+    this.state.player.seekTo( moment );
+  }
+
   render() {
     const style = {
       width: this.state.opts.width + 'px',
@@ -136,11 +159,24 @@ class YoutubeCustomPlayer extends React.Component {
             status={this.state.status}
             onClick={this.onPlayPauseVideo} />
 
+
           <PlayerTimer
             start={this.state.start}
             currentTime={this.state.currentTime}
             duration={this.state.duration} />
+
+          <PlayerSeekTo
+            amount="+15"
+            onClick={this.onSeekTo} />
+
+          <PlayerSeekTo
+            amount="-15"
+            onClick={this.onSeekTo} />
+
+
+
         </div>
+
 
         <YouTube
           className="player-canvas"

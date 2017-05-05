@@ -1,5 +1,18 @@
+.col-md-6{
+  margin-bottom: 1rem;
+}
 .player-canvas{
 
+}
+.timer{
+  margin: 0 .5rem;
+}
+.seekto{
+  border: 1px solid white;
+  display: inline-block;
+  cursor: pointer;
+  padding: 2px 5px;
+  margin: 0 .5rem;
 }
 .player-toolbar{
   background-color: rgba(0,0,0,.5);

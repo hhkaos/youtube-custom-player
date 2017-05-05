@@ -36,7 +36,7 @@ const PlayerTimer = ({currentTime, duration, start}) => {
   }
   duration = secsToStr(parseInt(duration))
   return (
-    <span>{ct} / {duration}</span>
+    <span className="timer">{ct} / {duration}</span>
   );
 
 }

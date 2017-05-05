@@ -38,7 +38,7 @@ class App extends React.Component {
           end: 144
         },
         {
-          title: 'Factores decisivos',
+          title: 'ØøFactores decisivos',
           start: 157,
           end: 262
         }
@@ -83,11 +83,11 @@ class App extends React.Component {
         //debugger
         return (
           <div className="col-md-6" key={key}>
-            <p>
+
             <CustomYoutubePlayer
 
               playerConfig={playerConfig} />
-            </p>
+
           </div>
         );
       });
