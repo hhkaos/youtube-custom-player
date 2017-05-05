@@ -111,7 +111,7 @@
 	        start: 74,
 	        end: 144
 	      }, {
-	        title: 'Factores decisivos',
+	        title: 'ØøFactores decisivos',
 	        start: 157,
 	        end: 262
 	      }]
@@ -159,13 +159,9 @@
 	        return _react2.default.createElement(
 	          'div',
 	          { className: 'col-md-6', key: key },
-	          _react2.default.createElement(
-	            'p',
-	            null,
-	            _react2.default.createElement(_youtube_custom_player2.default, {
+	          _react2.default.createElement(_youtube_custom_player2.default, {
 
-	              playerConfig: playerConfig })
-	          )
+	            playerConfig: playerConfig })
 	        );
 	      });
 
@@ -19946,7 +19942,11 @@
 
 	var _player_title2 = _interopRequireDefault(_player_title);
 
-	var _youtube_workaround = __webpack_require__(303);
+	var _player_seekto = __webpack_require__(303);
+
+	var _player_seekto2 = _interopRequireDefault(_player_seekto);
+
+	var _youtube_workaround = __webpack_require__(304);
 
 	var _youtube_workaround2 = _interopRequireDefault(_youtube_workaround);
 
@@ -19996,6 +19996,8 @@
 	    _this.myTimer = _this.myTimer.bind(_this);
 	    _this.startStopTimer = _this.startStopTimer.bind(_this);
 	    _this.showPlayerTitle = _this.showPlayerTitle.bind(_this);
+	    _this.onSeekTo = _this.onSeekTo.bind(_this);
+
 	    return _this;
 	  }
 
@@ -20046,6 +20048,10 @@
 	        this.startStopTimer('stop');
 	      }
 
+	      if (event.data === 0) {
+	        this.setState({ currentTime: this.state.end });
+	      }
+
 	      (0, _youtube_workaround2.default)(this.state, history);
 	    }
 	  }, {
@@ -20079,6 +20085,23 @@
 	      }
 	    }
 	  }, {
+	    key: 'onSeekTo',
+	    value: function onSeekTo(amount) {
+	      //debugger
+	      var a = parseInt(amount),
+	          cT = this.state.player.getCurrentTime();
+	      var moment = cT + a;
+
+	      if (moment < this.state.start) {
+	        moment = this.state.start;
+	      } else if (moment > this.state.end) {
+	        moment = this.state.end;
+	        this.setState({ end: this.state.end });
+	      }
+
+	      this.state.player.seekTo(moment);
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var style = {
@@ -20100,7 +20123,13 @@
 	          _react2.default.createElement(_player_timer2.default, {
 	            start: this.state.start,
 	            currentTime: this.state.currentTime,
-	            duration: this.state.duration })
+	            duration: this.state.duration }),
+	          _react2.default.createElement(_player_seekto2.default, {
+	            amount: '+15',
+	            onClick: this.onSeekTo }),
+	          _react2.default.createElement(_player_seekto2.default, {
+	            amount: '-15',
+	            onClick: this.onSeekTo })
 	        ),
 	        _react2.default.createElement(_reactYoutube2.default, {
 	          className: 'player-canvas',
@@ -27793,7 +27822,7 @@
 	  duration = secsToStr(parseInt(duration));
 	  return _react2.default.createElement(
 	    'span',
-	    null,
+	    { className: 'timer' },
 	    ct,
 	    ' / ',
 	    duration
@@ -27834,6 +27863,41 @@
 
 /***/ }),
 /* 303 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/*jshint esversion: 6 */
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var PlayerSeekTo = function PlayerSeekTo(_ref) {
+	  var _onClick = _ref.onClick,
+	      amount = _ref.amount;
+
+	  console.log("Amount=", amount);
+	  return _react2.default.createElement(
+	    'span',
+	    {
+	      className: 'seekto',
+	      onClick: function onClick() {
+	        return _onClick(amount);
+	      } },
+	    amount
+	  );
+	};
+
+	exports.default = PlayerSeekTo;
+
+/***/ }),
+/* 304 */
 /***/ (function(module, exports) {
 
 	'use strict';
