@@ -97,12 +97,24 @@
 	            loop: 1, // Loop 1 = true
 	            start: 0, // Start at second 90
 	            //end: 15,
-	            rel: 0 // Show related videos at the end
-	            //showinfo: 0
+	            rel: 0, // Show related videos at the end
+	            showinfo: 0
 	          }
 	        }
 	      },
-	      videos: [{ start: 0, end: 73 }, { start: 74, end: 144 }, { start: 157, end: 262 }]
+	      videos: [{
+	        title: 'Objetivo de la Charla',
+	        start: 0,
+	        end: 73
+	      }, {
+	        title: 'Claves de éxito',
+	        start: 74,
+	        end: 144
+	      }, {
+	        title: 'Factores decisivos',
+	        start: 157,
+	        end: 262
+	      }]
 	    };
 	    return _this;
 	  }
@@ -113,7 +125,8 @@
 	      var _this2 = this;
 
 	      var videoItems = this.state.videos.map(function (_ref) {
-	        var start = _ref.start,
+	        var title = _ref.title,
+	            start = _ref.start,
 	            end = _ref.end;
 
 
@@ -122,6 +135,7 @@
 	        //let config = this.state.playerConfig;
 	        var playerConfig = {
 	          videoId: 'p6QjUROOZKY',
+	          title: title,
 	          opts: {
 	            height: 197,
 	            width: 350,
@@ -132,8 +146,8 @@
 	              loop: 1, // Loop 1 = true
 	              start: start, // Start at second 90
 	              end: end,
-	              rel: 0 // Show related videos at the end
-	              //showinfo: 0
+	              rel: 0, // Show related videos at the end
+	              showinfo: 0
 	            }
 	          }
 	        };
@@ -142,38 +156,54 @@
 	        console.log("playerConfig=", playerConfig);
 
 	        //debugger
-	        return _react2.default.createElement(_youtube_custom_player2.default, {
-	          key: key,
-	          playerConfig: playerConfig });
+	        return _react2.default.createElement(
+	          'div',
+	          { className: 'col-md-6', key: key },
+	          _react2.default.createElement(
+	            'p',
+	            null,
+	            _react2.default.createElement(_youtube_custom_player2.default, {
+
+	              playerConfig: playerConfig })
+	          )
+	        );
 	      });
 
 	      return _react2.default.createElement(
 	        'div',
-	        null,
+	        { className: 'text-center' },
 	        _react2.default.createElement(
-	          'h1',
-	          null,
-	          'Youtube player'
-	        ),
-	        _react2.default.createElement('iframe', { width: '350', height: '197', src: 'https://www.youtube.com/embed/p6QjUROOZKY', frameborder: '0', allowfullscreen: true }),
-	        _react2.default.createElement(
-	          'h1',
-	          null,
-	          'Custom player'
-	        ),
-	        _react2.default.createElement(_youtube_custom_player2.default, {
-	          playerConfig: this.state.playerConfig
-	        }),
-	        _react2.default.createElement(
-	          'h1',
-	          null,
-	          'Video chopped'
+	          'div',
+	          { className: 'col-md-6' },
+	          _react2.default.createElement(
+	            'h1',
+	            null,
+	            'Youtube player'
+	          ),
+	          _react2.default.createElement('iframe', { width: '350', height: '197', src: 'https://www.youtube.com/embed/p6QjUROOZKY', frameborder: '0', allowfullscreen: true })
 	        ),
 	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          videoItems
-	        )
+	          'div',
+	          { className: 'col-md-6' },
+	          _react2.default.createElement(
+	            'h1',
+	            null,
+	            'Custom player'
+	          ),
+	          _react2.default.createElement(_youtube_custom_player2.default, {
+	            playerConfig: this.state.playerConfig
+	          })
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'col-md-12' },
+	          _react2.default.createElement(
+	            'h1',
+	            null,
+	            'Video chopped'
+	          )
+	        ),
+	        videoItems
 	      );
 	      /*
 	       */
@@ -19912,7 +19942,11 @@
 
 	var _player_timer2 = _interopRequireDefault(_player_timer);
 
-	var _youtube_workaround = __webpack_require__(302);
+	var _player_title = __webpack_require__(302);
+
+	var _player_title2 = _interopRequireDefault(_player_title);
+
+	var _youtube_workaround = __webpack_require__(303);
 
 	var _youtube_workaround2 = _interopRequireDefault(_youtube_workaround);
 
@@ -19934,6 +19968,7 @@
 
 	    _this.state = {
 	      videoId: props.playerConfig.videoId,
+	      title: props.playerConfig.title,
 	      opts: props.playerConfig.opts,
 	      status: 0,
 	      state_history: []
@@ -19960,6 +19995,7 @@
 	    _this.onPlayPauseVideo = _this.onPlayPauseVideo.bind(_this);
 	    _this.myTimer = _this.myTimer.bind(_this);
 	    _this.startStopTimer = _this.startStopTimer.bind(_this);
+	    _this.showPlayerTitle = _this.showPlayerTitle.bind(_this);
 	    return _this;
 	  }
 
@@ -19967,18 +20003,11 @@
 	    key: 'onReady',
 	    value: function onReady(event) {
 	      this.setState({ player: event.target });
-	      window.player = event.target;
-	      var pv = this.props.playerConfig.opts.playerVars;
-	      var start = pv.start ? pv.start : 0;
-	      console.log("start=", start);
-	      var end = pv.end ? pv.end : this.state.player.getDuration();
-	      console.log("end=", end);
-	      console.log("getCurrentTime=", this.state.player.getCurrentTime());
+	      //window.player = event.target;
+	      var pv = this.props.playerConfig.opts.playerVars,
+	          start = pv.start ? pv.start : 0,
+	          end = pv.end ? pv.end : this.state.player.getDuration();
 
-	      /*player.stopVideo();
-	      console.log("")
-	      this.state.player.seekTo(0, function(a){console.log("listo!")});
-	      player.playVideo();*/
 	      this.setState({ start: start });
 	      this.setState({ end: end });
 	      this.setState({ duration: end - start });
@@ -20029,6 +20058,18 @@
 	      }
 	    }
 	  }, {
+	    key: 'showPlayerTitle',
+	    value: function showPlayerTitle() {
+	      console.log("Custom title=", this.state.title);
+	      if (this.state.title) {
+	        return _react2.default.createElement(_player_title2.default, {
+	          key: this.state.title,
+	          title: this.state.title });
+	      } else {
+	        return '';
+	      }
+	    }
+	  }, {
 	    key: 'onPlayPauseVideo',
 	    value: function onPlayPauseVideo() {
 	      if (this.state.status === 1) {
@@ -20042,19 +20083,14 @@
 	    value: function render() {
 	      var style = {
 	        width: this.state.opts.width + 'px',
-	        height: this.state.opts.height + 60 + 'px'
+	        height: this.state.opts.height + 'px',
+	        position: 'relative'
 	      };
 
 	      return _react2.default.createElement(
 	        'div',
-	        { style: style },
-	        _react2.default.createElement(_reactYoutube2.default, {
-	          className: 'player-canvas',
-	          videoId: this.state.videoId,
-	          opts: this.state.opts,
-	          onReady: this.onReady,
-	          onStateChange: this.onStateChange
-	        }),
+	        { className: 'youtube-custom-player', style: style },
+	        this.showPlayerTitle(),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'player-toolbar' },
@@ -20065,7 +20101,14 @@
 	            start: this.state.start,
 	            currentTime: this.state.currentTime,
 	            duration: this.state.duration })
-	        )
+	        ),
+	        _react2.default.createElement(_reactYoutube2.default, {
+	          className: 'player-canvas',
+	          videoId: this.state.videoId,
+	          opts: this.state.opts,
+	          onReady: this.onReady,
+	          onStateChange: this.onStateChange
+	        })
 	      );
 	    }
 	  }]);
@@ -27761,6 +27804,36 @@
 
 /***/ }),
 /* 302 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/*jshint esversion: 6 */
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var PlayerTitle = function PlayerTitle(_ref) {
+	  var title = _ref.title;
+
+
+	  return _react2.default.createElement(
+	    'span',
+	    { className: 'player-title' },
+	    title
+	  );
+	};
+
+	exports.default = PlayerTitle;
+
+/***/ }),
+/* 303 */
 /***/ (function(module, exports) {
 
 	'use strict';

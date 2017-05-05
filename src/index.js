@@ -21,15 +21,27 @@ class App extends React.Component {
             loop: 1, // Loop 1 = true
             start: 0, // Start at second 90
             //end: 15,
-            rel: 0 // Show related videos at the end
-            //showinfo: 0
+            rel: 0, // Show related videos at the end
+            showinfo: 0
           }
         }
       },
       videos: [
-        { start: 0, end: 73 },
-        { start: 74, end: 144 },
-        { start: 157, end: 262 }
+        {
+          title: 'Objetivo de la Charla',
+          start: 0,
+          end: 73
+        },
+        {
+          title: 'Claves de éxito',
+          start: 74,
+          end: 144
+        },
+        {
+          title: 'Factores decisivos',
+          start: 157,
+          end: 262
+        }
       ]
     };
   }
@@ -41,13 +53,14 @@ class App extends React.Component {
   render() {
 
 
-      const videoItems = this.state.videos.map(({start, end}) => {
+      const videoItems = this.state.videos.map(({title, start, end}) => {
 
         console.log("my start "+start+" end "+ end);
         console.log("this.state.playerConfig.opts=",this.state.playerConfig.opts)
         //let config = this.state.playerConfig;
         const playerConfig ={
           videoId: 'p6QjUROOZKY',
+          title: title,
           opts: {
             height: 197,
             width: 350,
@@ -58,8 +71,8 @@ class App extends React.Component {
               loop: 1, // Loop 1 = true
               start: start, // Start at second 90
               end: end,
-              rel: 0 // Show related videos at the end
-              //showinfo: 0
+              rel: 0, // Show related videos at the end
+              showinfo: 0
             }
           }
         };
@@ -69,28 +82,38 @@ class App extends React.Component {
 
         //debugger
         return (
-          <CustomYoutubePlayer
-            key={key}
-            playerConfig={playerConfig} />
+          <div className="col-md-6" key={key}>
+            <p>
+            <CustomYoutubePlayer
+
+              playerConfig={playerConfig} />
+            </p>
+          </div>
         );
       });
 
 
 
     return (
-      <div>
-        <h1>Youtube player</h1>
-        <iframe width="350" height="197" src="https://www.youtube.com/embed/p6QjUROOZKY" frameborder="0" allowfullscreen></iframe>
+      <div className="text-center">
 
-        <h1>Custom player</h1>
-        <CustomYoutubePlayer
-          playerConfig={this.state.playerConfig}
-        />
+        <div className="col-md-6">
+          <h1>Youtube player</h1>
+          <iframe width="350" height="197" src="https://www.youtube.com/embed/p6QjUROOZKY" frameborder="0" allowfullscreen></iframe>
+        </div>
 
-        <h1>Video chopped</h1>
-        <ul>
-          {videoItems}
-        </ul>
+        <div className="col-md-6">
+          <h1>Custom player</h1>
+          <CustomYoutubePlayer
+            playerConfig={this.state.playerConfig}
+          />
+        </div>
+
+        <div className="col-md-12">
+          <h1>Video chopped</h1>
+        </div>
+
+        {videoItems}
 
       </div>
     );

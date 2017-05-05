@@ -3,8 +3,17 @@
 }
 .player-toolbar{
   background-color: rgba(0,0,0,.5);
-  top: -40px;
-  position: relative;
+  bottom: 0px;
+  position: absolute;
+  width: 100%;
+}
+.player-title{
+  background-color: rgba(0,0,0,.5);
+  top: 0px;
+  position: absolute;
+  width: 100%;
+  color: white;
+  padding: 10px 20px;
 }
 .player-toolbar .fa{
   color: white;
@@ -15,4 +24,9 @@
 }
 i.myBtn{
   padding: 10px 20px;
+}
+
+.text-center .youtube-custom-player{
+    margin: 0 auto;
+    text-align: left !important;
 }

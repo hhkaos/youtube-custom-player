@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import YouTube from 'react-youtube';
 import PlaypauseBtn from './player_playpause_btn';
 import PlayerTimer from './player_timer';
+import PlayerTitle from './player_title.js';
 import YoutubeWorkaround from './youtube_workaround';
 
 class YoutubeCustomPlayer extends React.Component {
@@ -13,6 +14,7 @@ class YoutubeCustomPlayer extends React.Component {
 
     this.state = {
       videoId: props.playerConfig.videoId,
+      title:  props.playerConfig.title,
       opts: props.playerConfig.opts,
       status: 0,
       state_history: []
@@ -33,22 +35,16 @@ class YoutubeCustomPlayer extends React.Component {
     this.onPlayPauseVideo = this.onPlayPauseVideo.bind(this);
     this.myTimer = this.myTimer.bind(this);
     this.startStopTimer = this.startStopTimer.bind(this);
+    this.showPlayerTitle = this.showPlayerTitle.bind(this);
   }
 
   onReady(event) {
     this.setState({player: event.target});
-    window.player = event.target;
-    const pv = this.props.playerConfig.opts.playerVars;
-    const start = pv.start? pv.start : 0;
-    console.log("start=",start);
-    const end = pv.end? pv.end : this.state.player.getDuration();
-    console.log("end=",end);
-    console.log("getCurrentTime=",this.state.player.getCurrentTime());
+    //window.player = event.target;
+    const pv = this.props.playerConfig.opts.playerVars,
+          start = pv.start ? pv.start : 0,
+          end = pv.end ? pv.end : this.state.player.getDuration();
 
-    /*player.stopVideo();
-    console.log("")
-    this.state.player.seekTo(0, function(a){console.log("listo!")});
-    player.playVideo();*/
     this.setState({ start: start });
     this.setState({ end: end });
     this.setState({ duration: end - start });
@@ -99,6 +95,21 @@ class YoutubeCustomPlayer extends React.Component {
     }
   }
 
+  showPlayerTitle(){
+    console.log("Custom title=",this.state.title);
+    if(this.state.title){
+      return (
+        <PlayerTitle
+          key={this.state.title}
+          title={this.state.title} />
+      );
+    }else{
+      return '';
+    }
+
+  }
+
+
   onPlayPauseVideo() {
     if(this.state.status === 1){
       this.state.player.pauseVideo();
@@ -111,18 +122,14 @@ class YoutubeCustomPlayer extends React.Component {
   render() {
     const style = {
       width: this.state.opts.width + 'px',
-      height: (this.state.opts.height + 60) + 'px'
+      height: (this.state.opts.height) + 'px',
+      position: 'relative'
     }
 
     return (
-      <div style={style}>
-        <YouTube
-          className="player-canvas"
-          videoId={this.state.videoId}
-          opts={this.state.opts}
-          onReady={this.onReady}
-          onStateChange={this.onStateChange}
-          />
+      <div className="youtube-custom-player" style={style}>
+
+        {this.showPlayerTitle()}
 
         <div className="player-toolbar">
           <PlaypauseBtn
@@ -134,6 +141,14 @@ class YoutubeCustomPlayer extends React.Component {
             currentTime={this.state.currentTime}
             duration={this.state.duration} />
         </div>
+
+        <YouTube
+          className="player-canvas"
+          videoId={this.state.videoId}
+          opts={this.state.opts}
+          onReady={this.onReady}
+          onStateChange={this.onStateChange}
+          />
       </div>
     );
   }
