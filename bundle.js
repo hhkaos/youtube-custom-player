@@ -86,17 +86,23 @@
 
 	    _this.state = {
 	      playerConfig: {
-	        videoId: '-DX3vJiqxm4',
+	        videoId: 'p6QjUROOZKY',
 	        opts: {
-	          height: 390,
-	          width: 640,
+	          height: 197,
+	          width: 350,
 	          playerVars: {
 	            // https://developers.google.com/youtube/player_parameters
-	            controls: 0, //Disable controls
-	            autoplay: 0, //No autoplay
-	            start: 1800 }
+	            autoplay: 0, // No autoplay
+	            controls: 0, // Disable controls
+	            loop: 1, // Loop 1 = true
+	            start: 0, // Start at second 90
+	            //end: 15,
+	            rel: 0 // Show related videos at the end
+	            //showinfo: 0
+	          }
 	        }
-	      }
+	      },
+	      videos: [{ start: 0, end: 73 }, { start: 74, end: 144 }, { start: 157, end: 262 }]
 	    };
 	    return _this;
 	  }
@@ -104,13 +110,73 @@
 	  _createClass(App, [{
 	    key: 'render',
 	    value: function render() {
+	      var _this2 = this;
+
+	      var videoItems = this.state.videos.map(function (_ref) {
+	        var start = _ref.start,
+	            end = _ref.end;
+
+
+	        console.log("my start " + start + " end " + end);
+	        console.log("this.state.playerConfig.opts=", _this2.state.playerConfig.opts);
+	        //let config = this.state.playerConfig;
+	        var playerConfig = {
+	          videoId: 'p6QjUROOZKY',
+	          opts: {
+	            height: 197,
+	            width: 350,
+	            playerVars: {
+	              // https://developers.google.com/youtube/player_parameters
+	              autoplay: 0, // No autoplay
+	              controls: 0, // Disable controls
+	              loop: 1, // Loop 1 = true
+	              start: start, // Start at second 90
+	              end: end,
+	              rel: 0 // Show related videos at the end
+	              //showinfo: 0
+	            }
+	          }
+	        };
+
+	        var key = playerConfig.videoId + start;
+	        console.log("playerConfig=", playerConfig);
+
+	        //debugger
+	        return _react2.default.createElement(_youtube_custom_player2.default, {
+	          key: key,
+	          playerConfig: playerConfig });
+	      });
+
 	      return _react2.default.createElement(
 	        'div',
 	        null,
+	        _react2.default.createElement(
+	          'h1',
+	          null,
+	          'Youtube player'
+	        ),
+	        _react2.default.createElement('iframe', { width: '350', height: '197', src: 'https://www.youtube.com/embed/p6QjUROOZKY', frameborder: '0', allowfullscreen: true }),
+	        _react2.default.createElement(
+	          'h1',
+	          null,
+	          'Custom player'
+	        ),
 	        _react2.default.createElement(_youtube_custom_player2.default, {
 	          playerConfig: this.state.playerConfig
-	        })
+	        }),
+	        _react2.default.createElement(
+	          'h1',
+	          null,
+	          'Video chopped'
+	        ),
+	        _react2.default.createElement(
+	          'ul',
+	          null,
+	          videoItems
+	        )
 	      );
+	      /*
+	       */
 	    }
 	  }]);
 
@@ -19846,6 +19912,10 @@
 
 	var _player_timer2 = _interopRequireDefault(_player_timer);
 
+	var _youtube_workaround = __webpack_require__(302);
+
+	var _youtube_workaround2 = _interopRequireDefault(_youtube_workaround);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19865,9 +19935,26 @@
 	    _this.state = {
 	      videoId: props.playerConfig.videoId,
 	      opts: props.playerConfig.opts,
-	      status: 0
+	      status: 0,
+	      state_history: []
 	    };
 
+	    if (_this.state.opts) {
+	      var vars = _this.state.opts.playerVars;
+	      if (vars && vars.start > vars.end) {
+	        throw Error('Error: end of video can not be before start');
+	      }
+	    } else {
+	      var _ret;
+
+	      console.log("Loading=", _this.state);
+	      return _ret = _react2.default.createElement(
+	        'div',
+	        null,
+	        'Loading...'
+	      ), _possibleConstructorReturn(_this, _ret);
+	    }
+	    console.log("{this.state.opts}=", _this.state.opts);
 	    _this.onReady = _this.onReady.bind(_this);
 	    _this.onStateChange = _this.onStateChange.bind(_this);
 	    _this.onPlayPauseVideo = _this.onPlayPauseVideo.bind(_this);
@@ -19880,13 +19967,20 @@
 	    key: 'onReady',
 	    value: function onReady(event) {
 	      this.setState({ player: event.target });
-
+	      window.player = event.target;
 	      var pv = this.props.playerConfig.opts.playerVars;
 	      var start = pv.start ? pv.start : 0;
+	      console.log("start=", start);
 	      var end = pv.end ? pv.end : this.state.player.getDuration();
+	      console.log("end=", end);
+	      console.log("getCurrentTime=", this.state.player.getCurrentTime());
 
-	      this.state.player.seekTo(start);
+	      /*player.stopVideo();
+	      console.log("")
+	      this.state.player.seekTo(0, function(a){console.log("listo!")});
+	      player.playVideo();*/
 	      this.setState({ start: start });
+	      this.setState({ end: end });
 	      this.setState({ duration: end - start });
 	    }
 	  }, {
@@ -19899,14 +19993,31 @@
 	  }, {
 	    key: 'onStateChange',
 	    value: function onStateChange(event) {
+	      /*
+	        BUFFERING: 3, ENDED: 0, PAUSED: 2, PLAYING: 1,
+	        UNSTARTED: -1, VIDEO_CUED: 5
+	      */
+	      var states = {
+	        '3': 'BUFFERING',
+	        '0': 'ENDED',
+	        '2': 'PAUSED',
+	        '1': 'PLAYING',
+	        '-1': 'UNSTARTED',
+	        '5': 'VIDEO_CUED'
+	      };
+	      this.state.state_history.push(states[event.data]);
+	      var history = this.state.state_history;
+	      this.setState({ state_history: history });
+	      console.log("state_history=", this.state.state_history);
 	      this.setState({ status: event.data });
 
 	      if (event.data === 1) {
-	        // start playing
 	        this.startStopTimer('start');
 	      } else {
 	        this.startStopTimer('stop');
 	      }
+
+	      (0, _youtube_workaround2.default)(this.state, history);
 	    }
 	  }, {
 	    key: 'startStopTimer',
@@ -23199,6 +23310,7 @@
 	};
 
 	module.exports = exports['default'];
+
 
 /***/ }),
 /* 173 */
@@ -27646,6 +27758,56 @@
 	};
 
 	exports.default = PlayerTimer;
+
+/***/ }),
+/* 302 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/*jshint esversion: 6 */
+	var intervalReference = void 0;
+
+	var checkProgress = function checkProgress(state) {
+	  console.log("Checking progress!=", state.player.getCurrentTime());
+	  if (parseInt(state.player.getCurrentTime(), 10) >= state.end) {
+	    state.player.stopVideo();
+	    clearInterval(intervalReference);
+	  }
+	};
+
+	var YoutubeWorkaround = function YoutubeWorkaround(state, history) {
+	  if (history[0] === 'BUFFERING' && history[1] === 'ENDED' && !history[8]) {
+	    console.log("history[2]=", history[2]);
+	    state.player.playVideo();
+	    if (history[2] === 'UNSTARTED' && !history[3]) {
+	      console.log("Paso 1");
+	      state.player.seekTo(state.start);
+	    } else if (history[2] === 'PLAYING' && !history[3]) {
+	      console.log("Paso 2");
+	      state.player.stopVideo();
+	    } else if (history[3] === 'UNSTARTED' && !history[4]) {
+	      console.log("Paso 3");
+	      state.player.seekTo(state.start);
+	      //debugger
+	    } else if (history[6] === 'PLAYING' && !history[7]) {
+	      state.player.seekTo(state.start);
+	    } else if (!intervalReference) {
+	      console.log("Empezamos a comprobar progreso");
+	      intervalReference = setInterval(function () {
+	        checkProgress(state);
+	      }, 1000);
+	      /*setTimeout(function(){
+	         state.player.stopVideo();
+	      }, end);*/
+	    }
+	  }
+	};
+
+	exports.default = YoutubeWorkaround;
 
 /***/ })
 /******/ ]);
